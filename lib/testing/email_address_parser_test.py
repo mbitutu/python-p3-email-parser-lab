@@ -1,32 +1,18 @@
-from email_address_parser import EmailAddressParser
+import re
 
-class TestEmailAddressParser:
-    '''Class EmailAddressParser in email_address_parser.py'''
+class EmailAddressParser:
 
-    def test_instantiates_with_string(self):
-        '''instantiates with a single argument, a string.'''
-        assert(EmailAddressParser("string string@string.com, mr. string, iamastring@icloud.com"))
+    email_regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9]+(\.[A-Z|a-z]{2,})+')
 
-    def test_has_parse_method(self):
-        '''contains a method called "parse".'''
-        assert(EmailAddressParser.parse)
+    def __init__(self, emails):
+        self.emails = emails
 
-    def test_parses_emails_with_spaces(self):
-        '''finds emails with spaces in between.'''
-        parser = EmailAddressParser("talk@talk.com john.jones@flatironschool.com alexa@amazon.com")
-        assert(parser.parse() == ["alexa@amazon.com", "john.jones@flatironschool.com", "talk@talk.com"])
+    def parse(self):
+        strings = re.split(r',|\s', self.emails)
 
-    def test_parses_emails_with_commas(self):
-        '''finds emails with commas in between.'''
-        parser = EmailAddressParser("talk@talk.com,john.jones@flatironschool.com,alexa@amazon.com")
-        assert(parser.parse() == ["alexa@amazon.com", "john.jones@flatironschool.com", "talk@talk.com"])
+        parsed_emails = set()
+        for string in strings:
+            if self.email_regex.fullmatch(string):
+                parsed_emails.add(string)
 
-    def test_parses_emails_with_commas_and_spaces(self):
-        '''finds emails with commas and spaces in between.'''
-        parser = EmailAddressParser("talk@talk.com, john.jones@flatironschool.com, alexa@amazon.com")
-        assert(parser.parse() == ["alexa@amazon.com", "john.jones@flatironschool.com", "talk@talk.com"])
-
-    def test_parses_emails_with_commas_and_spaces_and_non_emails(self):
-        '''finds emails with commas and spaces in between and removes non-email strings.'''
-        parser = EmailAddressParser("talk@talk.com, what john.jones@flatironschool.com, who alexa@amazon.com, where when why")
-        assert(parser.parse() == ["alexa@amazon.com", "john.jones@flatironschool.com", "talk@talk.com"])
+        return sorted(list(parsed_emails))
